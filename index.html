@@ -111,7 +111,7 @@
   .btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--line); font-size:13px; padding:9px 16px; }
   .btn-ghost:hover{ background:var(--bg); opacity:1; }
 
-  .row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .flex-row{ display:flex; gap:10px; flex-wrap:wrap; }
   .col{ flex:1; min-width:200px; }
 
   input[type=text]{
@@ -148,7 +148,6 @@
 
   .hero-ladder{ margin:0 0 26px; display:flex; justify-content:center; }
 
-  /* URLシェアバー */
   .share-bar{
     display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap;
   }
@@ -174,7 +173,6 @@
   .badge-admin{ background:var(--ink); color:#fff; }
   .badge-you{ background:var(--tiffany-tint); color:var(--tiffany-ink); border:1px solid var(--tiffany); }
 
-  /* 参加者リスト */
   ul.plist{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
   ul.plist li{
     background:var(--bg); border:1px solid var(--line);
@@ -183,32 +181,19 @@
   }
 
   /* 項目入力リスト */
-  .item-input-list{
-    display:flex; flex-direction:column; gap:8px;
-  }
-  .item-input-row{
-    display:flex; align-items:center; gap:10px;
-  }
+  .item-input-list{ display:flex; flex-direction:column; gap:8px; }
+  .item-input-row{ display:flex; align-items:center; gap:10px; }
   .item-input-row .item-index{
     font-family:'JetBrains Mono',monospace;
-    font-size:11px;
-    color:var(--ink-faint);
-    font-weight:600;
-    min-width:20px;
-    text-align:right;
-    flex-shrink:0;
+    font-size:11px; color:var(--ink-faint); font-weight:600;
+    min-width:20px; text-align:right; flex-shrink:0;
   }
   .item-input-row .item-saved{
-    font-size:11px;
-    color:var(--tiffany-deep);
-    font-weight:700;
-    opacity:0;
-    transition:opacity .2s;
-    flex-shrink:0;
+    font-size:11px; color:var(--tiffany-deep); font-weight:700;
+    opacity:0; transition:opacity .2s; flex-shrink:0;
   }
   .item-input-row .item-saved.show{ opacity:1; }
 
-  /* 項目表示リスト（閲覧者・開始後） */
   ul.ilist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:2px; overflow:hidden; }
   ul.ilist li{
     background:var(--panel);
@@ -216,7 +201,38 @@
     display:flex; align-items:center; gap:8px;
   }
 
-  .grid-wrap{ overflow-x:auto; padding:4px 0 2px; }
+  /* ラダーラップ：常に中央揃え・スクロール対応 */
+  .grid-wrap{
+    overflow-x:auto;
+    padding:4px 0 8px;
+    /* スクロールバーを常に非表示にしてもスクロール可能に */
+    scrollbar-width:none;
+  }
+  .grid-wrap::-webkit-scrollbar{ display:none; }
+  /* SVGを中央揃えで表示 */
+  .grid-wrap-inner{
+    display:flex;
+    justify-content:center;
+    min-width:100%;
+  }
+
+  /* 結果キャプチャ領域：SVGに合わせて幅を自動調整・中央揃え */
+  .result-capture-outer{
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .result-capture-outer::-webkit-scrollbar{ display:none; }
+  #resultCapture{
+    display:inline-block;
+    background:var(--bg);
+    padding:16px;
+    border-radius:4px;
+    /* 左右中央揃えにするため親をtext-align:centerに */
+  }
+  .result-capture-center{
+    text-align:center;
+  }
+
   .small-muted{ font-size:12px; color:var(--ink-soft); }
 
   .toast-wrap{ position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:999; display:flex; flex-direction:column; gap:8px; align-items:center;}
@@ -236,8 +252,7 @@
 
   .presence-bar{
     display:flex; align-items:center; gap:8px;
-    font-size:12px; color:var(--ink-soft);
-    margin-bottom:14px;
+    font-size:12px; color:var(--ink-soft); margin-bottom:14px;
   }
   .presence-dot{ width:7px; height:7px; border-radius:50%; background:#6bcf7f; flex-shrink:0; }
 
@@ -250,13 +265,13 @@
   .name-lbl{ font-family:'Zen Kaku Gothic New',sans-serif; font-size:12.5px; font-weight:700; }
   .item-lbl{ font-family:'Zen Kaku Gothic New',sans-serif; font-size:12.5px; font-weight:700; fill:var(--tiffany-ink); }
 
-  .grid-wrap{ overflow-x:auto; padding:4px 0 2px; }
-
   /* 結果リスト */
   .result-list{
     display:flex; flex-direction:column; gap:1px; margin-top:20px;
     opacity:0; transition:opacity .5s ease;
     background:var(--line); border:1px solid var(--line); border-radius:2px; overflow:hidden;
+    /* SVGに幅を合わせるため inline-block の親に追従 */
+    width:100%;
   }
   .result-list.show{ opacity:1; }
   .result-row{
@@ -272,14 +287,8 @@
   .result-row .arrow{ color:var(--ink-faint); text-align:center; }
   .result-row .prize{ font-weight:700; color:var(--tiffany-ink); }
 
-  .result-actions{
-    display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;
-  }
-
-  /* 追加フォーム */
-  .add-participant-form{
-    display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;
-  }
+  .result-actions{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .add-participant-form{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
 </style>
 </head>
 <body>
@@ -293,7 +302,6 @@ import {
   onValue, off, onDisconnect
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-// ─── Firebase 設定 ───────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyAPkqBvpPrZBb1WYJL22KDsBm2_TflQSio",
   authDomain: "amidakuji-95d5c.firebaseapp.com",
@@ -306,12 +314,10 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 
-// ─── 定数 ────────────────────────────────────────────────────────
 const ROWH = 32, LABELH = 42, COLW = 84, PAD = 30;
 const PALETTE = ['#ff9ebb','#7db8ef','#f5cf5a','#7ed9ab','#b79aef','#f5a86a','#5fc9d1','#e79ad0'];
 const ANIM_DURATION_MS = 1600;
 
-// ─── ユーティリティ ───────────────────────────────────────────────
 function uid(){ return Math.random().toString(36).slice(2,10); }
 function genCode(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -331,14 +337,9 @@ function toast(msg){
   setTimeout(()=>{ d.style.opacity='0'; d.style.transition='opacity .3s'; setTimeout(()=>d.remove(),300); },2200);
 }
 function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-function getRoomCodeFromURL(){
-  return new URLSearchParams(location.search).get('room')?.toUpperCase()||null;
-}
-function buildShareURL(code){
-  return `${location.origin}${location.pathname}?room=${code}`;
-}
+function getRoomCodeFromURL(){ return new URLSearchParams(location.search).get('room')?.toUpperCase()||null; }
+function buildShareURL(code){ return `${location.origin}${location.pathname}?room=${code}`; }
 
-// ─── Firebase Room CRUD ──────────────────────────────────────────
 function normalizeRoom(val){
   if(!val) return val;
   val.participants = val.participants || [];
@@ -348,30 +349,22 @@ function normalizeRoom(val){
   return val;
 }
 async function getRoom(code){
-  try{
-    const snap=await get(ref(db,'rooms/'+code));
-    return snap.exists()?normalizeRoom(snap.val()):null;
-  } catch(e){ console.error(e); return null; }
+  try{ const snap=await get(ref(db,'rooms/'+code)); return snap.exists()?normalizeRoom(snap.val()):null; }
+  catch(e){ console.error(e); return null; }
 }
 async function setRoom(code,obj){
   try{ await fbSet(ref(db,'rooms/'+code),obj); return true; }
   catch(e){ console.error(e); return false; }
 }
 
-// ─── ローカルID管理 ──────────────────────────────────────────────
 function getIdentity(code){
-  try{ const v=localStorage.getItem('amida-me:'+code); return v?JSON.parse(v):null; }
-  catch(e){ return null; }
+  try{ const v=localStorage.getItem('amida-me:'+code); return v?JSON.parse(v):null; } catch(e){ return null; }
 }
 function setIdentity(code,obj){
-  try{ localStorage.setItem('amida-me:'+code,JSON.stringify(obj)); }
-  catch(e){}
+  try{ localStorage.setItem('amida-me:'+code,JSON.stringify(obj)); } catch(e){}
 }
 
-// ─── Presence ────────────────────────────────────────────────────
-let presenceRef=null;
-let presenceCountUnsub=null;
-
+let presenceRef=null, presenceCountUnsub=null;
 function stopPresence(){
   if(presenceRef) remove(presenceRef).catch(()=>{});
   presenceRef=null;
@@ -381,8 +374,7 @@ function startPresence(code){
   stopPresence();
   const sessId=uid();
   presenceRef=ref(db,`rooms/${code}/presence/${sessId}`);
-  const connRef=ref(db,'.info/connected');
-  onValue(connRef,(snap)=>{
+  onValue(ref(db,'.info/connected'),(snap)=>{
     if(!snap.val()) return;
     fbSet(presenceRef,{joinedAt:Date.now()});
     onDisconnect(presenceRef).remove();
@@ -396,8 +388,7 @@ function startPresence(code){
   presenceCountUnsub=()=>off(pRef,'value',handler);
 }
 
-// ─── Room リアルタイム監視 ───────────────────────────────────────
-let roomRef=null; let roomListener=null;
+let roomRef=null, roomListener=null;
 function stopPoll(){
   if(roomRef&&roomListener) off(roomRef,'value',roomListener);
   roomRef=null; roomListener=null;
@@ -415,11 +406,9 @@ function startPoll(){
   });
 }
 
-// ─── アプリ状態 ──────────────────────────────────────────────────
 const S={ screen:'home', code:null, myId:null, myName:null, isViewer:false, room:null };
 const app=document.getElementById('app');
 
-// ─── ラダーロジック ──────────────────────────────────────────────
 function buildRungMap(rungs){
   const m={};
   (rungs||[]).forEach(({row,col})=>{ if(!m[row]) m[row]=new Set(); m[row].add(col); });
@@ -495,9 +484,12 @@ function buildPathSampler(segs){
   };
 }
 
-// ─── SVG描画 ────────────────────────────────────────────────────
+// ── SVGの実ピクセル幅を計算して返す ──────────────────────────────
+function ladderWidth(numCols){ return PAD*2+numCols*COLW; }
+function ladderHeight(rows){ return LABELH*2+rows*ROWH; }
+
 function ladderSVG({numCols,names,items,rungs,rows,interactive}){
-  const w=PAD*2+numCols*COLW, h=LABELH*2+rows*ROWH;
+  const w=ladderWidth(numCols), h=ladderHeight(rows);
   const byRow=buildRungMap(rungs);
   let svg=`<svg id="ladderSvg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
   svg+=`<defs><filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
@@ -528,7 +520,6 @@ function ladderSVG({numCols,names,items,rungs,rows,interactive}){
   return svg;
 }
 
-// ─── アニメーション ──────────────────────────────────────────────
 function animateLadderResult(names,items,rungs,rows){
   const byRow=buildRungMap(rungs);
   const svgEl=document.getElementById('ladderSvg');
@@ -590,7 +581,6 @@ function animateLadderResult(names,items,rungs,rows){
   },ANIM_DURATION_MS+200);
 }
 
-// ─── 画像保存 ────────────────────────────────────────────────────
 async function saveResultImage(){
   const target=document.getElementById('resultCapture');
   if(!target){ toast('保存対象が見つかりません'); return; }
@@ -605,7 +595,6 @@ async function saveResultImage(){
   } catch(e){ console.error(e); toast('画像の保存に失敗しました'); }
 }
 
-// ─── 画面描画：ホーム ────────────────────────────────────────────
 function renderHome(){
   stopPoll(); stopPresence();
   S.screen='home'; S.code=null; S.myId=null; S.myName=null; S.isViewer=false; S.room=null;
@@ -633,14 +622,13 @@ function renderHome(){
   document.getElementById('choiceJoin').onclick=()=>renderJoinCode(null);
 }
 
-// ─── 画面描画：管理者名前入力 ────────────────────────────────────
 function renderCreateName(){
   app.innerHTML=`
     <div class="eyebrow">部屋の作成</div>
     <h1 class="brand">管理者名の登録</h1>
     <div class="card">
       <p class="lead">管理者として部屋を作ります。参加者リストに登録される名前を入力してください。</p>
-      <div class="row">
+      <div class="flex-row">
         <div class="col"><input type="text" id="nameInput" placeholder="例）たなか" maxlength="20"></div>
         <button class="btn btn-primary" id="createBtn">部屋を作成する</button>
       </div>
@@ -657,7 +645,7 @@ function renderCreateName(){
     const room={
       code, adminId:id,
       participants:[{id,name}],
-      items:[{id:uid(),name:''}], // 最初の参加者分の項目欄を用意
+      items:[{id:uid(),name:''}],
       rungs:[], rows:10,
       started:false, columnOrder:null, itemOrder:null,
       createdAt:Date.now()
@@ -672,14 +660,13 @@ function renderCreateName(){
   input.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
 }
 
-// ─── 画面描画：コード入力 ────────────────────────────────────────
 function renderJoinCode(prefillCode){
   app.innerHTML=`
     <div class="eyebrow">参加する</div>
     <h1 class="brand">招待コード</h1>
     <div class="card">
       <p class="lead">管理者から共有された6桁の招待コードを入力してください。名前の登録は不要です。</p>
-      <div class="row">
+      <div class="flex-row">
         <div class="col"><input type="text" class="code-input" id="codeInput" maxlength="6" placeholder="ABC123" value="${esc(prefillCode||'')}"></div>
         <button class="btn btn-primary" id="joinBtn">入室する</button>
       </div>
@@ -711,7 +698,6 @@ function renderJoinCode(prefillCode){
   if(prefillCode) submit();
 }
 
-// ─── 部屋画面シェル ──────────────────────────────────────────────
 function renderRoomShell(){
   const room=S.room;
   app.innerHTML=`
@@ -721,40 +707,35 @@ function renderRoomShell(){
       <button class="btn btn-primary" id="copyUrlBtn">URLをコピー</button>
       <button class="copy-btn" id="copyCodeBtn">${esc(room.code)} コピー</button>
     </div>
-
     <div class="presence-bar">
       <div class="presence-dot"></div>
       <span id="presenceCount">接続中...</span>
     </div>
-
     <div id="statusBannerWrap"></div>
-
     <div class="card">
       <h2 class="sec"><span class="num">01</span>参加者</h2>
       <ul class="plist" id="participantList"></ul>
       <div id="addParticipantWrap"></div>
     </div>
-
     <div class="card">
       <h2 class="sec"><span class="num">02</span>項目</h2>
       <div id="itemsWrap"></div>
     </div>
-
     <div class="card">
       <h2 class="sec"><span class="num">03</span>あみだくじ</h2>
       <p class="lead" style="margin-bottom:12px;" id="ladderLead"></p>
-      <div class="grid-wrap" id="gridWrap"></div>
-      <div class="row" id="ladderEditControls" style="margin-top:14px;align-items:center;justify-content:space-between;">
-        <div class="row" style="gap:8px;">
+      <div class="grid-wrap" id="gridWrap">
+        <div class="grid-wrap-inner" id="gridWrapInner"></div>
+      </div>
+      <div class="flex-row" id="ladderEditControls" style="margin-top:14px;align-items:center;justify-content:space-between;">
+        <div class="flex-row" style="gap:8px;">
           <button class="btn btn-primary" id="addRandomRungBtn">🎲 横棒をランダムに追加</button>
           <button class="btn btn-secondary" id="addRowBtn">＋ 段を増やす</button>
         </div>
         <span class="small-muted" id="rowCountLbl"></span>
       </div>
     </div>
-
     <div class="card" id="startCardWrap"></div>
-
     <div class="footer-link"><a id="backHome2">← ホームに戻る</a></div>
   `;
   document.getElementById('backHome2').onclick=()=>{ stopPoll(); stopPresence(); renderHome(); };
@@ -769,13 +750,10 @@ function renderRoomShell(){
   updateRoomDynamic();
 }
 
-// ─── 項目セクション描画 ──────────────────────────────────────────
-// 参加者数と items 配列を同期させながら描画する
-// items[i] は participants[i] に対応する項目
+// ── 項目セクション描画 ───────────────────────────────────────────
 function renderItemsSection(room, isAdmin){
   const wrap=document.getElementById('itemsWrap');
   if(!wrap) return;
-
   const count=room.participants.length;
 
   if(count===0){
@@ -783,8 +761,7 @@ function renderItemsSection(room, isAdmin){
     return;
   }
 
-  if(room.started || !isAdmin){
-    // 開始後・閲覧者：読み取り専用リスト
+  if(room.started||!isAdmin){
     wrap.innerHTML=`
       <ul class="ilist">
         ${room.items.map((it,i)=>`
@@ -793,15 +770,12 @@ function renderItemsSection(room, isAdmin){
             <span style="font-weight:500;">${esc(it.name||'（未入力）')}</span>
           </li>`).join('')}
       </ul>
-      ${!isAdmin?`<p class="small-muted" style="margin-top:10px;">項目の編集は管理者のみ行えます。</p>`:''}
-    `;
+      ${!isAdmin?`<p class="small-muted" style="margin-top:10px;">項目の編集は管理者のみ行えます。</p>`:''}`;
     return;
   }
 
-  // 管理者 + 未開始：インライン入力欄
-  // items 配列を参加者数に合わせて正規化（足りなければ追加、多ければ切り捨て）
-  // ※ この正規化はローカル表示のみ。保存は blur/Enter 時に行う
-  const displayItems = Array.from({length:count}, (_,i)=>room.items[i]||{id:uid(),name:''});
+  // 管理者 + 未開始：インライン入力（参加者数分）
+  const displayItems=Array.from({length:count},(_,i)=>room.items[i]||{id:uid(),name:''});
 
   wrap.innerHTML=`
     <div class="item-input-list" id="itemInputList">
@@ -816,53 +790,60 @@ function renderItemsSection(room, isAdmin){
             value="${esc(it.name||'')}"
             placeholder="項目 ${i+1} を入力..."
             maxlength="20">
-          <span class="item-saved" id="saved-${i}">✓ 保存</span>
+          <span class="item-saved" id="saved-${i}">✓</span>
         </div>`).join('')}
     </div>
     <p class="small-muted" style="margin-top:12px;">全 ${count} 件の項目を入力すると開始できます。</p>
   `;
 
-  // 各入力欄のイベント
-  wrap.querySelectorAll('.item-field').forEach(inp=>{
-    const showSaved=(idx)=>{
-      const el=document.getElementById(`saved-${idx}`);
-      if(!el) return;
-      el.classList.add('show');
-      setTimeout(()=>el.classList.remove('show'),1500);
-    };
+  const fields=wrap.querySelectorAll('.item-field');
 
-    const save=async()=>{
-      const idx=parseInt(inp.dataset.idx);
-      const itemId=inp.dataset.itemid;
-      const val=inp.value.trim();
-      const fresh=await getRoom(S.code);
-      if(!fresh) return;
-      // items 配列を参加者数に合わせて正規化してから保存
-      const pCount=fresh.participants.length;
-      while(fresh.items.length<pCount) fresh.items.push({id:uid(),name:''});
-      fresh.items=fresh.items.slice(0,pCount);
-      // 対象インデックスを更新（IDが一致すれば優先、なければインデックスで）
-      const target=fresh.items.find(it=>it.id===itemId)||fresh.items[idx];
-      if(target) target.name=val;
-      await setRoom(S.code,fresh);
-      S.room=fresh;
-      showSaved(idx);
-      // 開始ボタンの状態だけ更新（入力欄は再描画しない）
-      updateStartCard(fresh, true);
-    };
+  const showSaved=(idx)=>{
+    const el=document.getElementById(`saved-${idx}`);
+    if(!el) return;
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'),1500);
+  };
 
-    inp.addEventListener('blur',save);
-    inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ inp.blur(); } });
+  const saveField=async(inp)=>{
+    const idx=parseInt(inp.dataset.idx);
+    const itemId=inp.dataset.itemid;
+    const val=inp.value.trim();
+    const fresh=await getRoom(S.code);
+    if(!fresh) return;
+    const pCount=fresh.participants.length;
+    while(fresh.items.length<pCount) fresh.items.push({id:uid(),name:''});
+    fresh.items=fresh.items.slice(0,pCount);
+    const target=fresh.items.find(it=>it.id===itemId)||fresh.items[idx];
+    if(target) target.name=val;
+    await setRoom(S.code,fresh);
+    S.room=fresh;
+    showSaved(idx);
+    updateStartCard(fresh,true);
+  };
+
+  fields.forEach((inp,i)=>{
+    inp.addEventListener('blur',()=>saveField(inp));
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        e.preventDefault();
+        // 次の欄へ遷移。最後の欄ならそのままsave
+        if(i<fields.length-1){
+          saveField(inp);
+          fields[i+1].focus();
+        } else {
+          inp.blur();
+        }
+      }
+    });
   });
 }
 
-// ─── 開始カードのみ更新 ──────────────────────────────────────────
-function updateStartCard(room, isAdmin){
+// ── 開始カードのみ更新 ───────────────────────────────────────────
+function updateStartCard(room,isAdmin){
   const startWrap=document.getElementById('startCardWrap');
   if(!startWrap) return;
-  if(room.started){
-    startWrap.innerHTML=''; return;
-  }
+  if(room.started){ startWrap.innerHTML=''; return; }
   if(!isAdmin){
     startWrap.innerHTML=`
       <h2 class="sec"><span class="num">04</span>開始</h2>
@@ -870,25 +851,23 @@ function updateStartCard(room, isAdmin){
     return;
   }
   const count=room.participants.length;
-  const allFilled=count>=2&&room.items.length>=count&&room.items.slice(0,count).every(it=>it.name&&it.name.trim()!=='');
+  const filledCount=room.items.slice(0,count).filter(it=>it.name&&it.name.trim()!=='').length;
+  const allFilled=count>=2&&filledCount===count;
   startWrap.innerHTML=`
     <h2 class="sec"><span class="num">04</span>開始</h2>
-    <p class="lead">参加者 <b>${count}人</b>・項目 <b>${room.items.filter(it=>it.name&&it.name.trim()!=='').length}/${count}件</b> 入力済み
+    <p class="lead">参加者 <b>${count}人</b>・項目 <b>${filledCount}/${count}件</b> 入力済み
       ${allFilled?'':`<br><span style="color:#a15a4a;font-weight:700;">※ 参加者を2人以上追加し、全員分の項目を入力してください</span>`}
     </p>
-    <button class="btn btn-primary" id="startBtn" ${allFilled?'':'disabled'}>あみだくじを開始する</button>
-  `;
+    <button class="btn btn-primary" id="startBtn" ${allFilled?'':'disabled'}>あみだくじを開始する</button>`;
   const sb=document.getElementById('startBtn');
   if(sb) sb.onclick=async()=>{
     const fresh=await getRoom(S.code);
     const ok=fresh.participants.length>=2
-      && fresh.items.length>=fresh.participants.length
-      && fresh.items.slice(0,fresh.participants.length).every(it=>it.name&&it.name.trim()!=='');
+      &&fresh.items.length>=fresh.participants.length
+      &&fresh.items.slice(0,fresh.participants.length).every(it=>it.name&&it.name.trim()!=='');
     if(!ok){ toast('参加者と項目を確認してください'); S.room=fresh; updateRoomDynamic(); return; }
     fresh.started=true;
     fresh.columnOrder=shuffle(fresh.participants.map(p=>p.id));
-    // columnOrder のインデックスに対応する項目名を itemOrder として保存
-    // participants[i] <-> items[i] の対応を維持
     const pidToItemName={};
     fresh.participants.forEach((p,i)=>{ pidToItemName[p.id]=(fresh.items[i]||{}).name||''; });
     fresh.itemOrder=fresh.columnOrder.map(id=>pidToItemName[id]);
@@ -897,23 +876,22 @@ function updateStartCard(room, isAdmin){
   };
 }
 
-// ─── 部屋画面：動的更新 ─────────────────────────────────────────
+// ── 部屋画面：動的更新 ──────────────────────────────────────────
 function updateRoomDynamic(){
   const room=S.room; if(!room) return;
   const isAdmin=(room.adminId===S.myId);
   const numCols=room.participants.length;
 
-  // ステータスバナー
   const bannerWrap=document.getElementById('statusBannerWrap');
   if(bannerWrap){
     bannerWrap.innerHTML=room.started
-      ? `<div class="status-banner">
-           <div class="dotmark"></div>
-           <div style="flex:1;">
-             <div class="txt">あみだくじが開始されました</div>
-             <div class="sub">下の「あみだくじ」欄で結果を確認できます。</div>
-           </div>
-         </div>` : '';
+      ?`<div class="status-banner">
+          <div class="dotmark"></div>
+          <div style="flex:1;">
+            <div class="txt">あみだくじが開始されました</div>
+            <div class="sub">下の「あみだくじ」欄で結果を確認できます。</div>
+          </div>
+        </div>`:'' ;
   }
 
   // 参加者リスト
@@ -924,11 +902,9 @@ function updateRoomDynamic(){
       if(p.id===room.adminId) tags.push('<span class="badge badge-admin">管理者</span>');
       if(p.id===S.myId) tags.push('<span class="badge badge-you">あなた</span>');
       const delBtn=isAdmin&&!room.started&&p.id!==room.adminId
-        ? `<button class="btn-danger btn" data-delp="${p.id}" style="padding:3px 9px;font-size:12px;">削除</button>`
-        : '';
+        ?`<button class="btn-danger btn" data-delp="${p.id}" style="padding:3px 9px;font-size:12px;">削除</button>`:'';
       return `<li>${esc(p.name)} ${tags.join(' ')}${delBtn}</li>`;
     }).join('')||'<li class="small-muted">まだ誰も参加していません</li>';
-
     if(isAdmin&&!room.started){
       pList.querySelectorAll('[data-delp]').forEach(btn=>{
         btn.onclick=async()=>{
@@ -936,10 +912,8 @@ function updateRoomDynamic(){
           const idx=fresh.participants.findIndex(p=>p.id===btn.dataset.delp);
           if(idx!==-1){
             fresh.participants.splice(idx,1);
-            // 対応する項目も削除
             if(fresh.items.length>idx) fresh.items.splice(idx,1);
           }
-          // 列数に合わせて rungs を整理
           const maxCol=fresh.participants.length-2;
           fresh.rungs=maxCol>=0?fresh.rungs.filter(r=>r.col<=maxCol):[];
           await setRoom(S.code,fresh);
@@ -950,6 +924,7 @@ function updateRoomDynamic(){
   }
 
   // 参加者追加フォーム（管理者・未開始）
+  // ※ フォーカスを項目欄に遷移させない：addP後はaddPInputにフォーカスを戻す
   const addPWrap=document.getElementById('addParticipantWrap');
   if(addPWrap){
     if(isAdmin&&!room.started){
@@ -968,16 +943,15 @@ function updateRoomDynamic(){
           if(fresh.started){ toast('開始後は追加できません'); return; }
           const id=uid();
           fresh.participants.push({id,name});
-          // 項目欄を参加者数に合わせて追加
           fresh.items.push({id:uid(),name:''});
           const newIndex=fresh.participants.length-1;
           if(newIndex>=1) addDefaultRungs(fresh,newIndex-1);
           await setRoom(S.code,fresh);
           S.room=fresh; pInp.value='';
           updateRoomDynamic();
-          // フォーカスを最後の項目入力欄に移す
-          const fields=document.querySelectorAll('.item-field');
-          if(fields.length) fields[fields.length-1].focus();
+          // フォーカスは参加者入力欄に戻す（項目欄には遷移しない）
+          const nextInp=document.getElementById('addPInput');
+          if(nextInp) nextInp.focus();
         };
         document.getElementById('addPBtn').onclick=addP;
         pInp.addEventListener('keydown',e=>{ if(e.key==='Enter') addP(); });
@@ -989,34 +963,34 @@ function updateRoomDynamic(){
   }
 
   // 項目セクション
-  renderItemsSection(room, isAdmin);
+  renderItemsSection(room,isAdmin);
 
   // ラダー説明
   const ladderLead=document.getElementById('ladderLead');
   if(ladderLead){
     ladderLead.textContent=room.started
-      ? '列の並びと項目はランダムに決定されています。アニメーションで経路を確認してください。'
-      : 'マス目をクリックするか、ボタンを押すと横棒を追加できます（管理者のみ）。列の並びは開始時にランダムに入れ替わります。';
+      ?'列の並びと項目はランダムに決定されています。アニメーションで経路を確認してください。'
+      :'マス目をクリックするか、ボタンを押すと横棒を追加できます（管理者のみ）。列の並びは開始時にランダムに入れ替わります。';
   }
   const ladderEditControls=document.getElementById('ladderEditControls');
   if(ladderEditControls) ladderEditControls.style.display=room.started?'none':'flex';
 
   // ラダー描画
-  const gridWrap=document.getElementById('gridWrap');
-  if(gridWrap){
+  const gridWrapInner=document.getElementById('gridWrapInner');
+  if(gridWrapInner){
     if(numCols<2&&!room.started){
-      gridWrap.innerHTML=`<p class="small-muted">参加者が2人以上になるとあみだくじを編集できます。</p>`;
-      gridWrap.dataset.mode='';
+      gridWrapInner.innerHTML=`<p class="small-muted" style="padding:8px 0;">参加者が2人以上になるとあみだくじを編集できます。</p>`;
+      gridWrapInner.dataset.mode='';
     } else if(!room.started){
-      gridWrap.dataset.mode='';
-      gridWrap.innerHTML=ladderSVG({
+      gridWrapInner.dataset.mode='';
+      gridWrapInner.innerHTML=ladderSVG({
         numCols,names:room.participants.map(p=>p.name),items:null,
         rungs:room.rungs,rows:room.rows,interactive:isAdmin
       });
       if(isAdmin){
-        gridWrap.querySelectorAll('.rung-hit').forEach(rect=>{
+        gridWrapInner.querySelectorAll('.rung-hit').forEach(rect=>{
           rect.onclick=async()=>{
-            const row=parseInt(rect.dataset.row), col=parseInt(rect.dataset.col);
+            const row=parseInt(rect.dataset.row),col=parseInt(rect.dataset.col);
             const fresh=await getRoom(S.code);
             const byRow=buildRungMap(fresh.rungs);
             const set=byRow[row]||new Set();
@@ -1033,27 +1007,50 @@ function updateRoomDynamic(){
         });
       }
     } else {
+      // 開始後：結果表示
       const nameById={};
       room.participants.forEach(p=>nameById[p.id]=p.name);
       const names=room.columnOrder.map(id=>nameById[id]||'?');
       const items=room.itemOrder;
       const key=`started:${JSON.stringify(room.columnOrder)}:${JSON.stringify(room.itemOrder)}:${JSON.stringify(room.rungs)}:${room.rows}`;
-      if(gridWrap.dataset.mode!==key){
-        gridWrap.dataset.mode=key;
-        gridWrap.innerHTML=`
-          <div id="resultCapture" style="background:var(--bg);padding:16px;border-radius:4px;">
-            ${ladderSVG({numCols,names,items,rungs:room.rungs,rows:room.rows,interactive:false})}
-            <div class="result-list" id="resultList"></div>
+      if(gridWrapInner.dataset.mode!==key){
+        gridWrapInner.dataset.mode=key;
+
+        // SVGの実ピクセル幅をresultCaptureの幅として設定
+        const svgW=ladderWidth(numCols);
+        const svgH=ladderHeight(room.rows);
+
+        // resultCapture を SVG 幅に固定し、result-list もその幅に揃える
+        gridWrapInner.innerHTML=`
+          <div class="result-capture-center" style="width:100%;">
+            <div id="resultCapture" style="
+              display:inline-block;
+              background:var(--bg);
+              padding:16px;
+              border-radius:4px;
+              width:${svgW+32}px;
+            ">
+              ${ladderSVG({numCols,names,items,rungs:room.rungs,rows:room.rows,interactive:false})}
+              <div class="result-list" id="resultList" style="width:${svgW}px;"></div>
+            </div>
           </div>`;
+
         setTimeout(()=>animateLadderResult(names,items,room.rungs,room.rows),80);
+
         setTimeout(()=>{
           const capture=document.getElementById('resultCapture');
           if(!capture) return;
-          capture.insertAdjacentHTML('afterend',`
-            <div class="result-actions">
-              <button class="btn btn-ghost" id="saveImgBtn">📷 画像で保存</button>
-              ${isAdmin?`<button class="btn btn-danger" id="redrawBtn">🔄 再抽選</button>`:''}
-            </div>`);
+          // result-actions は resultCapture の外に出して通常フローで表示
+          const actionsDiv=document.createElement('div');
+          actionsDiv.className='result-actions';
+          actionsDiv.style.justifyContent='center';
+          actionsDiv.style.marginTop='16px';
+          actionsDiv.innerHTML=`
+            <button class="btn btn-ghost" id="saveImgBtn">📷 画像で保存</button>
+            ${isAdmin?`<button class="btn btn-danger" id="redrawBtn">🔄 再抽選</button>`:''}`;
+          // gridWrapInner の後ろに挿入（card の中）
+          const ladderCard=gridWrapInner.closest('.card');
+          if(ladderCard) ladderCard.appendChild(actionsDiv);
           document.getElementById('saveImgBtn').onclick=saveResultImage;
           if(isAdmin){
             document.getElementById('redrawBtn').onclick=async()=>{
@@ -1069,7 +1066,6 @@ function updateRoomDynamic(){
     }
   }
 
-  // 段数・ボタン
   const rowLbl=document.getElementById('rowCountLbl');
   if(rowLbl) rowLbl.textContent=`現在 ${room.rows} 段`;
 
@@ -1094,11 +1090,9 @@ function updateRoomDynamic(){
     };
   }
 
-  // 開始カード
-  updateStartCard(room, isAdmin);
+  updateStartCard(room,isAdmin);
 }
 
-// ─── エントリーポイント ───────────────────────────────────────────
 const urlCode=getRoomCodeFromURL();
 if(urlCode){ renderJoinCode(urlCode); }
 else{ renderHome(); }
