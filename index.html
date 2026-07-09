@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>あみだくじ</title>
+<link rel="icon" href="amidakuji-favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="amidakuji-favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="amidakuji-favicon-16x16.png">
+<link rel="apple-touch-icon" href="amidakuji-apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --bg:#f6f4ef;
+    --panel:#ffffff;
+    --line:#e4e0d5;
+    --ink:#333330;
+    --ink-soft:#847f73;
+    --ink-faint:#a8a297;
+    --tiffany:#81d8d0;
+    --tiffany-deep:#3f9e94;
+    --tiffany-ink:#1f5b55;
+    --tiffany-tint:#e6f6f4;
+    --radius:4px;
+    --glow-color:#81d8d0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:56px 16px 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{ width:100%; max-width:720px; }
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.16em;
+    color:var(--tiffany-deep);
+    text-transform:uppercase;
+    margin:0 0 10px 1px;
+    font-weight:600;
+  }
+  h1.brand{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:700;
+    font-size:26px;
+    color:var(--ink);
+    margin:0 0 34px 1px;
+    letter-spacing:.02em;
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px;
+  }
+  .card + .card{ margin-top:14px; }
+
+  h2.sec{
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.06em;
+    margin:0 0 20px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--line);
+    color:var(--ink);
+  }
+  h2.sec .num{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--tiffany-deep);
+    margin-right:8px;
+  }
+
+  p.lead{ color:var(--ink-soft); line-height:1.85; margin:0 0 22px; font-size:14px; font-weight:400;}
+
+  .btn{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    border:1px solid var(--ink);
+    border-radius:2px;
+    padding:12px 22px;
+    cursor:pointer;
+    background:var(--panel);
+    color:var(--ink);
+    transition:opacity .15s ease, background .15s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    letter-spacing:.02em;
+  }
+  .btn:hover{ opacity:.75; }
+  .btn:active{ opacity:.55; }
+  .btn-primary{ background:var(--tiffany); color:#0f3d38; border:1px solid var(--tiffany); font-weight:700; }
+  .btn-primary:hover{ background:var(--tiffany-deep); border-color:var(--tiffany-deep); color:#fff; opacity:1; }
+  .btn-secondary{ background:var(--panel); color:var(--ink); border:1px solid var(--line); }
+  .btn-secondary:hover{ background:var(--bg); opacity:1; }
+  .btn:disabled{ opacity:.35; cursor:not-allowed; }
+  .btn-danger{ background:transparent; color:#a15a4a; border:1px solid #d8c9c0; padding:6px 12px; font-size:12.5px; font-weight:600;}
+  .btn-danger:hover{ background:#faf3f0; opacity:1; }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--line); font-size:13px; padding:9px 16px; }
+  .btn-ghost:hover{ background:var(--bg); opacity:1; }
+
+  .row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .col{ flex:1; min-width:200px; }
+
+  input[type=text]{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:14px;
+    padding:12px 14px;
+    border-radius:2px;
+    border:1px solid var(--line);
+    background:var(--bg);
+    color:var(--ink);
+    width:100%;
+    outline:none;
+  }
+  input[type=text]:focus{ border-color:var(--tiffany-deep); background:#fff; }
+  input.code-input{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.35em;
+    text-align:center;
+    font-size:20px;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+
+  .home-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:2px; overflow:hidden;}
+  @media(max-width:560px){ .home-grid{ grid-template-columns:1fr; } }
+  .choice{
+    padding:26px 22px; cursor:pointer;
+    background:var(--panel);
+    transition:background .15s;
+  }
+  .choice:hover{ background:var(--tiffany-tint); }
+  .choice .ttl{ font-weight:700; font-size:15px; margin-bottom:8px; color:var(--ink);}
+  .choice .sub{ font-size:12.5px; color:var(--ink-soft); line-height:1.7;}
+
+  .hero-ladder{ margin:0 0 26px; display:flex; justify-content:center; }
+
+  /* URLシェアバー */
+  .share-bar{
+    display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap;
+  }
+  .share-bar input{
+    flex:1; min-width:160px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    background:var(--bg);
+    color:var(--ink-soft);
+    outline:none;
+  }
+  .copy-btn{
+    background:var(--tiffany); color:#0f3d38; border:none; border-radius:2px;
+    padding:7px 14px; font-size:11.5px; font-weight:700; cursor:pointer;
+    font-family:'Zen Kaku Gothic New'; letter-spacing:.03em; white-space:nowrap;
+  }
+  .copy-btn:hover{ background:var(--tiffany-deep); color:#fff; }
+
+  .badge{ font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:2px; letter-spacing:.02em; }
+  .badge-admin{ background:var(--ink); color:#fff; }
+  .badge-you{ background:var(--tiffany-tint); color:var(--tiffany-ink); border:1px solid var(--tiffany); }
+
+  /* 参加者リスト */
+  ul.plist{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+  ul.plist li{
+    background:var(--bg); border:1px solid var(--line);
+    padding:8px 13px; border-radius:2px; font-size:13.5px; font-weight:500;
+    display:flex; align-items:center; gap:7px;
+  }
+
+  /* 項目入力リスト */
+  .item-input-list{
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .item-input-row{
+    display:flex; align-items:center; gap:10px;
+  }
+  .item-input-row .item-index{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--ink-faint);
+    font-weight:600;
+    min-width:20px;
+    text-align:right;
+    flex-shrink:0;
+  }
+  .item-input-row .item-saved{
+    font-size:11px;
+    color:var(--tiffany-deep);
+    font-weight:700;
+    opacity:0;
+    transition:opacity .2s;
+    flex-shrink:0;
+  }
+  .item-input-row .item-saved.show{ opacity:1; }
+
+  /* 項目表示リスト（閲覧者・開始後） */
+  ul.ilist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:2px; overflow:hidden; }
+  ul.ilist li{
+    background:var(--panel);
+    padding:11px 14px; font-size:14px; font-weight:500;
+    display:flex; align-items:center; gap:8px;
+  }
+
+  .grid-wrap{ overflow-x:auto; padding:4px 0 2px; }
+  .small-muted{ font-size:12px; color:var(--ink-soft); }
+
+  .toast-wrap{ position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:999; display:flex; flex-direction:column; gap:8px; align-items:center;}
+  .toast{
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:2px; font-size:13px;
+    animation:fadeIn .18s ease;
+  }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+
+  .status-banner{
+    display:flex; align-items:center; gap:14px; padding:16px 18px; border-radius:2px;
+    background:var(--tiffany-tint); border:1px solid var(--tiffany); margin-bottom:14px;
+  }
+  .status-banner .dotmark{ flex-shrink:0; width:9px; height:9px; border-radius:50%; background:var(--tiffany-deep); }
+  .status-banner .txt{ font-weight:700; font-size:14px; color:var(--tiffany-ink); }
+  .status-banner .sub{ font-size:12px; color:var(--ink-soft); font-weight:500; }
+
+  .presence-bar{
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .presence-dot{ width:7px; height:7px; border-radius:50%; background:#6bcf7f; flex-shrink:0; }
+
+  .footer-link{ text-align:center; margin-top:22px; }
+  .footer-link a{ color:var(--ink-faint); font-size:12.5px; text-decoration:none; cursor:pointer; }
+  .footer-link a:hover{ color:var(--tiffany-deep); text-decoration:underline; }
+
+  .rung-hit{ fill:transparent; cursor:pointer; }
+  .rung-hit:hover{ fill:rgba(129,216,208,0.16); }
+  .name-lbl{ font-family:'Zen Kaku Gothic New',sans-serif; font-size:12.5px; font-weight:700; }
+  .item-lbl{ font-family:'Zen Kaku Gothic New',sans-serif; font-size:12.5px; font-weight:700; fill:var(--tiffany-ink); }
+
+  .grid-wrap{ overflow-x:auto; padding:4px 0 2px; }
+
+  /* 結果リスト */
+  .result-list{
+    display:flex; flex-direction:column; gap:1px; margin-top:20px;
+    opacity:0; transition:opacity .5s ease;
+    background:var(--line); border:1px solid var(--line); border-radius:2px; overflow:hidden;
+  }
+  .result-list.show{ opacity:1; }
+  .result-row{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    background:var(--panel);
+    padding:12px 16px;
+    font-size:14px;
+    gap:8px;
+  }
+  .result-row .who{ font-weight:700; }
+  .result-row .arrow{ color:var(--ink-faint); text-align:center; }
+  .result-row .prize{ font-weight:700; color:var(--tiffany-ink); }
+
+  .result-actions{
+    display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;
+  }
+
+  /* 追加フォーム */
+  .add-participant-form{
+    display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getDatabase, ref, get, set as fbSet, remove,
+  onValue, off, onDisconnect
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// ─── Firebase 設定 ───────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyAPkqBvpPrZBb1WYJL22KDsBm2_TflQSio",
+  authDomain: "amidakuji-95d5c.firebaseapp.com",
+  databaseURL: "https://amidakuji-95d5c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "amidakuji-95d5c",
+  storageBucket: "amidakuji-95d5c.firebasestorage.app",
+  messagingSenderId: "758466062786",
+  appId: "1:758466062786:web:4aa0c826d8920d48cdce5b"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+
+// ─── 定数 ────────────────────────────────────────────────────────
+const ROWH = 32, LABELH = 42, COLW = 84, PAD = 30;
+const PALETTE = ['#ff9ebb','#7db8ef','#f5cf5a','#7ed9ab','#b79aef','#f5a86a','#5fc9d1','#e79ad0'];
+const ANIM_DURATION_MS = 1600;
+
+// ─── ユーティリティ ───────────────────────────────────────────────
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function genCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s=''; for(let i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+function shuffle(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function toast(msg){
+  const wrap=document.getElementById('toastWrap');
+  const d=document.createElement('div');
+  d.className='toast'; d.textContent=msg;
+  wrap.appendChild(d);
+  setTimeout(()=>{ d.style.opacity='0'; d.style.transition='opacity .3s'; setTimeout(()=>d.remove(),300); },2200);
+}
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function getRoomCodeFromURL(){
+  return new URLSearchParams(location.search).get('room')?.toUpperCase()||null;
+}
+function buildShareURL(code){
+  return `${location.origin}${location.pathname}?room=${code}`;
+}
+
+// ─── Firebase Room CRUD ──────────────────────────────────────────
+function normalizeRoom(val){
+  if(!val) return val;
+  val.participants = val.participants || [];
+  val.items        = val.items        || [];
+  val.rungs        = val.rungs        || [];
+  val.rows         = val.rows         || 10;
+  return val;
+}
+async function getRoom(code){
+  try{
+    const snap=await get(ref(db,'rooms/'+code));
+    return snap.exists()?normalizeRoom(snap.val()):null;
+  } catch(e){ console.error(e); return null; }
+}
+async function setRoom(code,obj){
+  try{ await fbSet(ref(db,'rooms/'+code),obj); return true; }
+  catch(e){ console.error(e); return false; }
+}
+
+// ─── ローカルID管理 ──────────────────────────────────────────────
+function getIdentity(code){
+  try{ const v=localStorage.getItem('amida-me:'+code); return v?JSON.parse(v):null; }
+  catch(e){ return null; }
+}
+function setIdentity(code,obj){
+  try{ localStorage.setItem('amida-me:'+code,JSON.stringify(obj)); }
+  catch(e){}
+}
+
+// ─── Presence ────────────────────────────────────────────────────
+let presenceRef=null;
+let presenceCountUnsub=null;
+
+function stopPresence(){
+  if(presenceRef) remove(presenceRef).catch(()=>{});
+  presenceRef=null;
+  if(presenceCountUnsub){ presenceCountUnsub(); presenceCountUnsub=null; }
+}
+function startPresence(code){
+  stopPresence();
+  const sessId=uid();
+  presenceRef=ref(db,`rooms/${code}/presence/${sessId}`);
+  const connRef=ref(db,'.info/connected');
+  onValue(connRef,(snap)=>{
+    if(!snap.val()) return;
+    fbSet(presenceRef,{joinedAt:Date.now()});
+    onDisconnect(presenceRef).remove();
+  });
+  const pRef=ref(db,`rooms/${code}/presence`);
+  const handler=onValue(pRef,(snap)=>{
+    const count=snap.exists()?Object.keys(snap.val()).length:0;
+    const el=document.getElementById('presenceCount');
+    if(el) el.textContent=`${count}人が閲覧中`;
+  });
+  presenceCountUnsub=()=>off(pRef,'value',handler);
+}
+
+// ─── Room リアルタイム監視 ───────────────────────────────────────
+let roomRef=null; let roomListener=null;
+function stopPoll(){
+  if(roomRef&&roomListener) off(roomRef,'value',roomListener);
+  roomRef=null; roomListener=null;
+}
+function startPoll(){
+  stopPoll();
+  if(!S.code) return;
+  roomRef=ref(db,'rooms/'+S.code);
+  roomListener=onValue(roomRef,(snapshot)=>{
+    if(!snapshot.exists()) return;
+    const fresh=normalizeRoom(snapshot.val());
+    const changed=JSON.stringify(fresh)!==JSON.stringify(S.room);
+    S.room=fresh;
+    if(changed&&S.screen==='room') updateRoomDynamic();
+  });
+}
+
+// ─── アプリ状態 ──────────────────────────────────────────────────
+const S={ screen:'home', code:null, myId:null, myName:null, isViewer:false, room:null };
+const app=document.getElementById('app');
+
+// ─── ラダーロジック ──────────────────────────────────────────────
+function buildRungMap(rungs){
+  const m={};
+  (rungs||[]).forEach(({row,col})=>{ if(!m[row]) m[row]=new Set(); m[row].add(col); });
+  return m;
+}
+function colX(i){ return PAD+i*COLW+COLW/2; }
+
+function addDefaultRungs(room,col){
+  const DEFAULT_COUNT=3; let tries=0, avail=[];
+  while(avail.length<DEFAULT_COUNT&&tries<6){
+    const byRow=buildRungMap(room.rungs); avail=[];
+    for(let r=0;r<room.rows;r++){
+      const s=byRow[r];
+      if(!s||!(s.has(col-1)||s.has(col)||s.has(col+1))) avail.push(r);
+    }
+    if(avail.length<DEFAULT_COUNT) room.rows+=4;
+    tries++;
+  }
+  shuffle(avail).slice(0,DEFAULT_COUNT).sort((a,b)=>a-b).forEach(r=>room.rungs.push({row:r,col}));
+}
+
+function addRandomRung(room){
+  const n=room.participants.length; if(n<2) return false;
+  let tries=0, avail=[];
+  while(avail.length===0&&tries<6){
+    const byRow=buildRungMap(room.rungs); avail=[];
+    for(let r=0;r<room.rows;r++){
+      const s=byRow[r];
+      for(let c=0;c<n-1;c++){
+        if(!s||!(s.has(c-1)||s.has(c)||s.has(c+1))) avail.push({row:r,col:c});
+      }
+    }
+    if(avail.length===0) room.rows+=4;
+    tries++;
+  }
+  if(avail.length===0) return false;
+  room.rungs.push(avail[Math.floor(Math.random()*avail.length)]);
+  return true;
+}
+
+function tracePath(startCol,byRow,rows){
+  let cur=startCol; const segs=[];
+  let prevX=colX(cur), prevY=LABELH;
+  for(let r=0;r<rows;r++){
+    const s=byRow[r]; let next=cur;
+    const midY=LABELH+(r+0.5)*ROWH, botY=LABELH+(r+1)*ROWH;
+    segs.push({x1:prevX,y1:prevY,x2:prevX,y2:midY}); prevX=colX(cur); prevY=midY;
+    if(s){ if(s.has(cur-1)) next=cur-1; else if(s.has(cur)) next=cur+1; }
+    if(next!==cur){ segs.push({x1:colX(cur),y1:midY,x2:colX(next),y2:midY}); prevX=colX(next); prevY=midY; }
+    segs.push({x1:prevX,y1:prevY,x2:prevX,y2:botY}); prevX=colX(next); prevY=botY;
+    cur=next;
+  }
+  return {segs,dest:cur};
+}
+
+function buildPathSampler(segs){
+  const lengths=[]; let total=0;
+  segs.forEach(({x1,y1,x2,y2})=>{ total+=Math.hypot(x2-x1,y2-y1); lengths.push(total); });
+  return {
+    total,
+    sampleAt(dist){
+      const d=Math.max(0,Math.min(dist,total));
+      for(let i=0;i<segs.length;i++){
+        if(d<=lengths[i]){
+          const prev=i===0?0:lengths[i-1];
+          const t=(d-prev)/(lengths[i]-prev);
+          const {x1,y1,x2,y2}=segs[i];
+          return {x:x1+(x2-x1)*t,y:y1+(y2-y1)*t};
+        }
+      }
+      const l=segs[segs.length-1]; return {x:l.x2,y:l.y2};
+    }
+  };
+}
+
+// ─── SVG描画 ────────────────────────────────────────────────────
+function ladderSVG({numCols,names,items,rungs,rows,interactive}){
+  const w=PAD*2+numCols*COLW, h=LABELH*2+rows*ROWH;
+  const byRow=buildRungMap(rungs);
+  let svg=`<svg id="ladderSvg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
+  svg+=`<defs><filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>`;
+  for(let c=0;c<numCols;c++){
+    const vc=PALETTE[c%PALETTE.length];
+    svg+=`<line x1="${colX(c)}" y1="${LABELH}" x2="${colX(c)}" y2="${LABELH+rows*ROWH}" stroke="${vc}" stroke-width="5" stroke-linecap="round" opacity="0.35"/>`;
+    svg+=`<text class="name-lbl" x="${colX(c)}" y="${LABELH-14}" text-anchor="middle" fill="${vc}">${esc(names[c]||'')}</text>`;
+    if(items) svg+=`<text class="item-lbl" x="${colX(c)}" y="${LABELH+rows*ROWH+26}" text-anchor="middle">${esc(items[c]||'')}</text>`;
+  }
+  for(let r=0;r<rows;r++){
+    const s=byRow[r]; if(!s) continue;
+    s.forEach(c=>{
+      const y=LABELH+(r+0.5)*ROWH;
+      svg+=`<line x1="${colX(c)}" y1="${y}" x2="${colX(c+1)}" y2="${y}" stroke="#a8e6df" stroke-width="5" stroke-linecap="round" opacity="0.35"/>`;
+    });
+  }
+  if(interactive){
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<numCols-1;c++){
+        svg+=`<rect class="rung-hit" data-row="${r}" data-col="${c}" x="${colX(c)}" y="${LABELH+r*ROWH}" width="${COLW}" height="${ROWH}" rx="2"></rect>`;
+      }
+    }
+  }
+  svg+=`</svg>`;
+  return svg;
+}
+
+// ─── アニメーション ──────────────────────────────────────────────
+function animateLadderResult(names,items,rungs,rows){
+  const byRow=buildRungMap(rungs);
+  const svgEl=document.getElementById('ladderSvg');
+  if(!svgEl) return;
+  const svgNS='http://www.w3.org/2000/svg';
+  const destinations=[];
+  const allPaths=names.map((_,c)=>tracePath(c,byRow,rows));
+  allPaths.forEach(({dest})=>destinations.push(dest));
+  const startTime=performance.now();
+  names.forEach((name,c)=>{
+    const color=PALETTE[c%PALETTE.length];
+    const {segs}=allPaths[c];
+    const sampler=buildPathSampler(segs);
+    const glowLine=document.createElementNS(svgNS,'polyline');
+    glowLine.setAttribute('fill','none');
+    glowLine.setAttribute('stroke',color);
+    glowLine.setAttribute('stroke-width','5');
+    glowLine.setAttribute('stroke-linecap','round');
+    glowLine.setAttribute('stroke-linejoin','round');
+    glowLine.setAttribute('filter','url(#glowFilter)');
+    glowLine.setAttribute('opacity','0.9');
+    svgEl.appendChild(glowLine);
+    const ball=document.createElementNS(svgNS,'circle');
+    ball.setAttribute('r','8');
+    ball.setAttribute('fill',color);
+    ball.setAttribute('filter','url(#glowFilter)');
+    ball.setAttribute('stroke','#fff');
+    ball.setAttribute('stroke-width','2');
+    svgEl.appendChild(ball);
+    function frame(now){
+      const elapsed=now-startTime;
+      const progress=Math.min(elapsed/ANIM_DURATION_MS,1);
+      const eased=progress<0.5?2*progress*progress:1-Math.pow(-2*progress+2,2)/2;
+      const dist=eased*sampler.total;
+      const pos=sampler.sampleAt(dist);
+      ball.setAttribute('cx',pos.x); ball.setAttribute('cy',pos.y);
+      const steps=Math.max(2,Math.ceil(120*eased));
+      const pts=[];
+      for(let i=0;i<=steps;i++){
+        const p=sampler.sampleAt((i/steps)*dist);
+        pts.push(`${p.x},${p.y}`);
+      }
+      glowLine.setAttribute('points',pts.join(' '));
+      if(progress<1){ requestAnimationFrame(frame); }
+      else{ ball.setAttribute('r','11'); ball.setAttribute('stroke-width','3'); }
+    }
+    requestAnimationFrame(frame);
+  });
+  setTimeout(()=>{
+    const list=document.getElementById('resultList');
+    if(!list) return;
+    list.innerHTML=names.map((n,c)=>`
+      <div class="result-row">
+        <span class="who" style="color:${PALETTE[c%PALETTE.length]}">${esc(n)}</span>
+        <span class="arrow">→</span>
+        <span class="prize">${esc(items[destinations[c]]||'')}</span>
+      </div>`).join('');
+    list.classList.add('show');
+  },ANIM_DURATION_MS+200);
+}
+
+// ─── 画像保存 ────────────────────────────────────────────────────
+async function saveResultImage(){
+  const target=document.getElementById('resultCapture');
+  if(!target){ toast('保存対象が見つかりません'); return; }
+  try{
+    toast('画像を生成中...');
+    const canvas=await html2canvas(target,{backgroundColor:'#f6f4ef',scale:2,useCORS:true});
+    const link=document.createElement('a');
+    link.download=`amidakuji-${S.code}-${Date.now()}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    toast('画像を保存しました');
+  } catch(e){ console.error(e); toast('画像の保存に失敗しました'); }
+}
+
+// ─── 画面描画：ホーム ────────────────────────────────────────────
+function renderHome(){
+  stopPoll(); stopPresence();
+  S.screen='home'; S.code=null; S.myId=null; S.myName=null; S.isViewer=false; S.room=null;
+  history.replaceState(null,'',location.pathname);
+  app.innerHTML=`
+    <div class="eyebrow">Amidakuji</div>
+    <h1 class="brand">あみだくじ</h1>
+    <div class="card">
+      <div class="hero-ladder">${ladderSVG({numCols:4,names:['A','B','C','D'],items:null,rungs:[{row:1,col:0},{row:2,col:2},{row:4,col:1},{row:5,col:0}],rows:7,interactive:false})}</div>
+      <p class="lead">招待URLを共有すれば、みんなで同じあみだくじを観覧できます。参加者の追加・削除は管理者のみ行えます。</p>
+      <div class="home-grid">
+        <div class="choice" id="choiceCreate">
+          <div class="ttl">新しく作る</div>
+          <div class="sub">部屋を作成し、招待URLを発行します。作成した人が管理者になります。</div>
+        </div>
+        <div class="choice" id="choiceJoin">
+          <div class="ttl">招待コードで参加する</div>
+          <div class="sub">発行されたコードを入力し、観覧者として入室します。</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-link small-muted" style="text-align:center;margin-top:16px;">同じ招待コードを開いた人同士で状態が同期されます</div>
+  `;
+  document.getElementById('choiceCreate').onclick=renderCreateName;
+  document.getElementById('choiceJoin').onclick=()=>renderJoinCode(null);
+}
+
+// ─── 画面描画：管理者名前入力 ────────────────────────────────────
+function renderCreateName(){
+  app.innerHTML=`
+    <div class="eyebrow">部屋の作成</div>
+    <h1 class="brand">管理者名の登録</h1>
+    <div class="card">
+      <p class="lead">管理者として部屋を作ります。参加者リストに登録される名前を入力してください。</p>
+      <div class="row">
+        <div class="col"><input type="text" id="nameInput" placeholder="例）たなか" maxlength="20"></div>
+        <button class="btn btn-primary" id="createBtn">部屋を作成する</button>
+      </div>
+      <div class="footer-link"><a id="backHome">← ホームに戻る</a></div>
+    </div>
+  `;
+  document.getElementById('backHome').onclick=renderHome;
+  const input=document.getElementById('nameInput');
+  input.focus();
+  const submit=async()=>{
+    const name=input.value.trim();
+    if(!name){ toast('名前を入力してください'); return; }
+    const id=uid(), code=genCode();
+    const room={
+      code, adminId:id,
+      participants:[{id,name}],
+      items:[{id:uid(),name:''}], // 最初の参加者分の項目欄を用意
+      rungs:[], rows:10,
+      started:false, columnOrder:null, itemOrder:null,
+      createdAt:Date.now()
+    };
+    await setRoom(code,room);
+    setIdentity(code,{id,name});
+    S.code=code; S.myId=id; S.myName=name; S.isViewer=false; S.room=room; S.screen='room';
+    history.replaceState(null,'',`?room=${code}`);
+    renderRoomShell(); startPoll(); startPresence(code);
+  };
+  document.getElementById('createBtn').onclick=submit;
+  input.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+}
+
+// ─── 画面描画：コード入力 ────────────────────────────────────────
+function renderJoinCode(prefillCode){
+  app.innerHTML=`
+    <div class="eyebrow">参加する</div>
+    <h1 class="brand">招待コード</h1>
+    <div class="card">
+      <p class="lead">管理者から共有された6桁の招待コードを入力してください。名前の登録は不要です。</p>
+      <div class="row">
+        <div class="col"><input type="text" class="code-input" id="codeInput" maxlength="6" placeholder="ABC123" value="${esc(prefillCode||'')}"></div>
+        <button class="btn btn-primary" id="joinBtn">入室する</button>
+      </div>
+      <div id="joinErr" class="small-muted" style="color:#a15a4a;margin-top:10px;"></div>
+      <div class="footer-link"><a id="backHome">← ホームに戻る</a></div>
+    </div>
+  `;
+  document.getElementById('backHome').onclick=renderHome;
+  const input=document.getElementById('codeInput');
+  if(!prefillCode) input.focus();
+  const submit=async()=>{
+    const code=input.value.trim().toUpperCase();
+    if(code.length<4){ toast('コードを入力してください'); return; }
+    const room=await getRoom(code);
+    if(!room){ document.getElementById('joinErr').textContent='そのコードの部屋が見つかりませんでした。'; return; }
+    S.code=code; S.room=room;
+    const existing=getIdentity(code);
+    if(existing&&room.participants.some(p=>p.id===existing.id)){
+      S.myId=existing.id; S.myName=existing.name; S.isViewer=false;
+    } else {
+      S.myId=null; S.myName=null; S.isViewer=true;
+    }
+    S.screen='room';
+    history.replaceState(null,'',`?room=${code}`);
+    renderRoomShell(); startPoll(); startPresence(code);
+  };
+  document.getElementById('joinBtn').onclick=submit;
+  input.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+  if(prefillCode) submit();
+}
+
+// ─── 部屋画面シェル ──────────────────────────────────────────────
+function renderRoomShell(){
+  const room=S.room;
+  app.innerHTML=`
+    <div class="eyebrow">部屋コード</div>
+    <div class="share-bar">
+      <input type="text" value="${esc(buildShareURL(room.code))}" readonly>
+      <button class="btn btn-primary" id="copyUrlBtn">URLをコピー</button>
+      <button class="copy-btn" id="copyCodeBtn">${esc(room.code)} コピー</button>
+    </div>
+
+    <div class="presence-bar">
+      <div class="presence-dot"></div>
+      <span id="presenceCount">接続中...</span>
+    </div>
+
+    <div id="statusBannerWrap"></div>
+
+    <div class="card">
+      <h2 class="sec"><span class="num">01</span>参加者</h2>
+      <ul class="plist" id="participantList"></ul>
+      <div id="addParticipantWrap"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec"><span class="num">02</span>項目</h2>
+      <div id="itemsWrap"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec"><span class="num">03</span>あみだくじ</h2>
+      <p class="lead" style="margin-bottom:12px;" id="ladderLead"></p>
+      <div class="grid-wrap" id="gridWrap"></div>
+      <div class="row" id="ladderEditControls" style="margin-top:14px;align-items:center;justify-content:space-between;">
+        <div class="row" style="gap:8px;">
+          <button class="btn btn-primary" id="addRandomRungBtn">🎲 横棒をランダムに追加</button>
+          <button class="btn btn-secondary" id="addRowBtn">＋ 段を増やす</button>
+        </div>
+        <span class="small-muted" id="rowCountLbl"></span>
+      </div>
+    </div>
+
+    <div class="card" id="startCardWrap"></div>
+
+    <div class="footer-link"><a id="backHome2">← ホームに戻る</a></div>
+  `;
+  document.getElementById('backHome2').onclick=()=>{ stopPoll(); stopPresence(); renderHome(); };
+  document.getElementById('copyUrlBtn').onclick=async()=>{
+    try{ await navigator.clipboard.writeText(buildShareURL(room.code)); toast('URLをコピーしました'); }
+    catch(e){ toast('コピーできませんでした'); }
+  };
+  document.getElementById('copyCodeBtn').onclick=async()=>{
+    try{ await navigator.clipboard.writeText(room.code); toast('コードをコピーしました'); }
+    catch(e){ toast('コピーできませんでした'); }
+  };
+  updateRoomDynamic();
+}
+
+// ─── 項目セクション描画 ──────────────────────────────────────────
+// 参加者数と items 配列を同期させながら描画する
+// items[i] は participants[i] に対応する項目
+function renderItemsSection(room, isAdmin){
+  const wrap=document.getElementById('itemsWrap');
+  if(!wrap) return;
+
+  const count=room.participants.length;
+
+  if(count===0){
+    wrap.innerHTML=`<p class="small-muted">参加者を追加すると項目の入力欄が表示されます。</p>`;
+    return;
+  }
+
+  if(room.started || !isAdmin){
+    // 開始後・閲覧者：読み取り専用リスト
+    wrap.innerHTML=`
+      <ul class="ilist">
+        ${room.items.map((it,i)=>`
+          <li>
+            <span class="small-muted" style="font-family:'JetBrains Mono',monospace;font-size:11px;min-width:20px;">${i+1}</span>
+            <span style="font-weight:500;">${esc(it.name||'（未入力）')}</span>
+          </li>`).join('')}
+      </ul>
+      ${!isAdmin?`<p class="small-muted" style="margin-top:10px;">項目の編集は管理者のみ行えます。</p>`:''}
+    `;
+    return;
+  }
+
+  // 管理者 + 未開始：インライン入力欄
+  // items 配列を参加者数に合わせて正規化（足りなければ追加、多ければ切り捨て）
+  // ※ この正規化はローカル表示のみ。保存は blur/Enter 時に行う
+  const displayItems = Array.from({length:count}, (_,i)=>room.items[i]||{id:uid(),name:''});
+
+  wrap.innerHTML=`
+    <div class="item-input-list" id="itemInputList">
+      ${displayItems.map((it,i)=>`
+        <div class="item-input-row">
+          <span class="item-index">${i+1}</span>
+          <input
+            type="text"
+            class="item-field"
+            data-idx="${i}"
+            data-itemid="${it.id}"
+            value="${esc(it.name||'')}"
+            placeholder="項目 ${i+1} を入力..."
+            maxlength="20">
+          <span class="item-saved" id="saved-${i}">✓ 保存</span>
+        </div>`).join('')}
+    </div>
+    <p class="small-muted" style="margin-top:12px;">全 ${count} 件の項目を入力すると開始できます。</p>
+  `;
+
+  // 各入力欄のイベント
+  wrap.querySelectorAll('.item-field').forEach(inp=>{
+    const showSaved=(idx)=>{
+      const el=document.getElementById(`saved-${idx}`);
+      if(!el) return;
+      el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'),1500);
+    };
+
+    const save=async()=>{
+      const idx=parseInt(inp.dataset.idx);
+      const itemId=inp.dataset.itemid;
+      const val=inp.value.trim();
+      const fresh=await getRoom(S.code);
+      if(!fresh) return;
+      // items 配列を参加者数に合わせて正規化してから保存
+      const pCount=fresh.participants.length;
+      while(fresh.items.length<pCount) fresh.items.push({id:uid(),name:''});
+      fresh.items=fresh.items.slice(0,pCount);
+      // 対象インデックスを更新（IDが一致すれば優先、なければインデックスで）
+      const target=fresh.items.find(it=>it.id===itemId)||fresh.items[idx];
+      if(target) target.name=val;
+      await setRoom(S.code,fresh);
+      S.room=fresh;
+      showSaved(idx);
+      // 開始ボタンの状態だけ更新（入力欄は再描画しない）
+      updateStartCard(fresh, true);
+    };
+
+    inp.addEventListener('blur',save);
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ inp.blur(); } });
+  });
+}
+
+// ─── 開始カードのみ更新 ──────────────────────────────────────────
+function updateStartCard(room, isAdmin){
+  const startWrap=document.getElementById('startCardWrap');
+  if(!startWrap) return;
+  if(room.started){
+    startWrap.innerHTML=''; return;
+  }
+  if(!isAdmin){
+    startWrap.innerHTML=`
+      <h2 class="sec"><span class="num">04</span>開始</h2>
+      <p class="lead">管理者があみだくじを開始するのをお待ちください。</p>`;
+    return;
+  }
+  const count=room.participants.length;
+  const allFilled=count>=2&&room.items.length>=count&&room.items.slice(0,count).every(it=>it.name&&it.name.trim()!=='');
+  startWrap.innerHTML=`
+    <h2 class="sec"><span class="num">04</span>開始</h2>
+    <p class="lead">参加者 <b>${count}人</b>・項目 <b>${room.items.filter(it=>it.name&&it.name.trim()!=='').length}/${count}件</b> 入力済み
+      ${allFilled?'':`<br><span style="color:#a15a4a;font-weight:700;">※ 参加者を2人以上追加し、全員分の項目を入力してください</span>`}
+    </p>
+    <button class="btn btn-primary" id="startBtn" ${allFilled?'':'disabled'}>あみだくじを開始する</button>
+  `;
+  const sb=document.getElementById('startBtn');
+  if(sb) sb.onclick=async()=>{
+    const fresh=await getRoom(S.code);
+    const ok=fresh.participants.length>=2
+      && fresh.items.length>=fresh.participants.length
+      && fresh.items.slice(0,fresh.participants.length).every(it=>it.name&&it.name.trim()!=='');
+    if(!ok){ toast('参加者と項目を確認してください'); S.room=fresh; updateRoomDynamic(); return; }
+    fresh.started=true;
+    fresh.columnOrder=shuffle(fresh.participants.map(p=>p.id));
+    // columnOrder のインデックスに対応する項目名を itemOrder として保存
+    // participants[i] <-> items[i] の対応を維持
+    const pidToItemName={};
+    fresh.participants.forEach((p,i)=>{ pidToItemName[p.id]=(fresh.items[i]||{}).name||''; });
+    fresh.itemOrder=fresh.columnOrder.map(id=>pidToItemName[id]);
+    await setRoom(S.code,fresh);
+    S.room=fresh; updateRoomDynamic();
+  };
+}
+
+// ─── 部屋画面：動的更新 ─────────────────────────────────────────
+function updateRoomDynamic(){
+  const room=S.room; if(!room) return;
+  const isAdmin=(room.adminId===S.myId);
+  const numCols=room.participants.length;
+
+  // ステータスバナー
+  const bannerWrap=document.getElementById('statusBannerWrap');
+  if(bannerWrap){
+    bannerWrap.innerHTML=room.started
+      ? `<div class="status-banner">
+           <div class="dotmark"></div>
+           <div style="flex:1;">
+             <div class="txt">あみだくじが開始されました</div>
+             <div class="sub">下の「あみだくじ」欄で結果を確認できます。</div>
+           </div>
+         </div>` : '';
+  }
+
+  // 参加者リスト
+  const pList=document.getElementById('participantList');
+  if(pList){
+    pList.innerHTML=room.participants.map(p=>{
+      const tags=[];
+      if(p.id===room.adminId) tags.push('<span class="badge badge-admin">管理者</span>');
+      if(p.id===S.myId) tags.push('<span class="badge badge-you">あなた</span>');
+      const delBtn=isAdmin&&!room.started&&p.id!==room.adminId
+        ? `<button class="btn-danger btn" data-delp="${p.id}" style="padding:3px 9px;font-size:12px;">削除</button>`
+        : '';
+      return `<li>${esc(p.name)} ${tags.join(' ')}${delBtn}</li>`;
+    }).join('')||'<li class="small-muted">まだ誰も参加していません</li>';
+
+    if(isAdmin&&!room.started){
+      pList.querySelectorAll('[data-delp]').forEach(btn=>{
+        btn.onclick=async()=>{
+          const fresh=await getRoom(S.code);
+          const idx=fresh.participants.findIndex(p=>p.id===btn.dataset.delp);
+          if(idx!==-1){
+            fresh.participants.splice(idx,1);
+            // 対応する項目も削除
+            if(fresh.items.length>idx) fresh.items.splice(idx,1);
+          }
+          // 列数に合わせて rungs を整理
+          const maxCol=fresh.participants.length-2;
+          fresh.rungs=maxCol>=0?fresh.rungs.filter(r=>r.col<=maxCol):[];
+          await setRoom(S.code,fresh);
+          S.room=fresh; updateRoomDynamic();
+        };
+      });
+    }
+  }
+
+  // 参加者追加フォーム（管理者・未開始）
+  const addPWrap=document.getElementById('addParticipantWrap');
+  if(addPWrap){
+    if(isAdmin&&!room.started){
+      if(!addPWrap.dataset.built){
+        addPWrap.dataset.built='1';
+        addPWrap.innerHTML=`
+          <div class="add-participant-form">
+            <div class="col"><input type="text" id="addPInput" placeholder="追加する参加者の名前" maxlength="20"></div>
+            <button class="btn btn-secondary" id="addPBtn">＋ 追加</button>
+          </div>`;
+        const pInp=document.getElementById('addPInput');
+        const addP=async()=>{
+          const name=pInp.value.trim();
+          if(!name){ toast('名前を入力してください'); return; }
+          const fresh=await getRoom(S.code);
+          if(fresh.started){ toast('開始後は追加できません'); return; }
+          const id=uid();
+          fresh.participants.push({id,name});
+          // 項目欄を参加者数に合わせて追加
+          fresh.items.push({id:uid(),name:''});
+          const newIndex=fresh.participants.length-1;
+          if(newIndex>=1) addDefaultRungs(fresh,newIndex-1);
+          await setRoom(S.code,fresh);
+          S.room=fresh; pInp.value='';
+          updateRoomDynamic();
+          // フォーカスを最後の項目入力欄に移す
+          const fields=document.querySelectorAll('.item-field');
+          if(fields.length) fields[fields.length-1].focus();
+        };
+        document.getElementById('addPBtn').onclick=addP;
+        pInp.addEventListener('keydown',e=>{ if(e.key==='Enter') addP(); });
+      }
+    } else {
+      addPWrap.innerHTML='';
+      addPWrap.dataset.built='';
+    }
+  }
+
+  // 項目セクション
+  renderItemsSection(room, isAdmin);
+
+  // ラダー説明
+  const ladderLead=document.getElementById('ladderLead');
+  if(ladderLead){
+    ladderLead.textContent=room.started
+      ? '列の並びと項目はランダムに決定されています。アニメーションで経路を確認してください。'
+      : 'マス目をクリックするか、ボタンを押すと横棒を追加できます（管理者のみ）。列の並びは開始時にランダムに入れ替わります。';
+  }
+  const ladderEditControls=document.getElementById('ladderEditControls');
+  if(ladderEditControls) ladderEditControls.style.display=room.started?'none':'flex';
+
+  // ラダー描画
+  const gridWrap=document.getElementById('gridWrap');
+  if(gridWrap){
+    if(numCols<2&&!room.started){
+      gridWrap.innerHTML=`<p class="small-muted">参加者が2人以上になるとあみだくじを編集できます。</p>`;
+      gridWrap.dataset.mode='';
+    } else if(!room.started){
+      gridWrap.dataset.mode='';
+      gridWrap.innerHTML=ladderSVG({
+        numCols,names:room.participants.map(p=>p.name),items:null,
+        rungs:room.rungs,rows:room.rows,interactive:isAdmin
+      });
+      if(isAdmin){
+        gridWrap.querySelectorAll('.rung-hit').forEach(rect=>{
+          rect.onclick=async()=>{
+            const row=parseInt(rect.dataset.row), col=parseInt(rect.dataset.col);
+            const fresh=await getRoom(S.code);
+            const byRow=buildRungMap(fresh.rungs);
+            const set=byRow[row]||new Set();
+            const exists=fresh.rungs.some(r=>r.row===row&&r.col===col);
+            if(exists){
+              fresh.rungs=fresh.rungs.filter(r=>!(r.row===row&&r.col===col));
+            } else {
+              if(set.has(col-1)||set.has(col)||set.has(col+1)){ toast('隣接するマスには横棒を置けません'); return; }
+              fresh.rungs.push({row,col});
+            }
+            await setRoom(S.code,fresh);
+            S.room=fresh; updateRoomDynamic();
+          };
+        });
+      }
+    } else {
+      const nameById={};
+      room.participants.forEach(p=>nameById[p.id]=p.name);
+      const names=room.columnOrder.map(id=>nameById[id]||'?');
+      const items=room.itemOrder;
+      const key=`started:${JSON.stringify(room.columnOrder)}:${JSON.stringify(room.itemOrder)}:${JSON.stringify(room.rungs)}:${room.rows}`;
+      if(gridWrap.dataset.mode!==key){
+        gridWrap.dataset.mode=key;
+        gridWrap.innerHTML=`
+          <div id="resultCapture" style="background:var(--bg);padding:16px;border-radius:4px;">
+            ${ladderSVG({numCols,names,items,rungs:room.rungs,rows:room.rows,interactive:false})}
+            <div class="result-list" id="resultList"></div>
+          </div>`;
+        setTimeout(()=>animateLadderResult(names,items,room.rungs,room.rows),80);
+        setTimeout(()=>{
+          const capture=document.getElementById('resultCapture');
+          if(!capture) return;
+          capture.insertAdjacentHTML('afterend',`
+            <div class="result-actions">
+              <button class="btn btn-ghost" id="saveImgBtn">📷 画像で保存</button>
+              ${isAdmin?`<button class="btn btn-danger" id="redrawBtn">🔄 再抽選</button>`:''}
+            </div>`);
+          document.getElementById('saveImgBtn').onclick=saveResultImage;
+          if(isAdmin){
+            document.getElementById('redrawBtn').onclick=async()=>{
+              if(!confirm('再抽選しますか？現在の結果がリセットされます。')) return;
+              const fresh=await getRoom(S.code);
+              fresh.started=false; fresh.columnOrder=null; fresh.itemOrder=null;
+              await setRoom(S.code,fresh);
+              S.room=fresh; updateRoomDynamic();
+            };
+          }
+        },ANIM_DURATION_MS+400);
+      }
+    }
+  }
+
+  // 段数・ボタン
+  const rowLbl=document.getElementById('rowCountLbl');
+  if(rowLbl) rowLbl.textContent=`現在 ${room.rows} 段`;
+
+  const addRungBtn=document.getElementById('addRandomRungBtn');
+  if(addRungBtn){
+    addRungBtn.disabled=room.started||numCols<2||!isAdmin;
+    addRungBtn.onclick=async()=>{
+      const fresh=await getRoom(S.code);
+      if(!addRandomRung(fresh)){ toast('これ以上追加できる場所がありません'); return; }
+      await setRoom(S.code,fresh);
+      S.room=fresh; updateRoomDynamic();
+    };
+  }
+  const addRowBtn=document.getElementById('addRowBtn');
+  if(addRowBtn){
+    addRowBtn.disabled=room.started||!isAdmin;
+    addRowBtn.onclick=async()=>{
+      const fresh=await getRoom(S.code);
+      fresh.rows=(fresh.rows||10)+2;
+      await setRoom(S.code,fresh);
+      S.room=fresh; updateRoomDynamic();
+    };
+  }
+
+  // 開始カード
+  updateStartCard(room, isAdmin);
+}
+
+// ─── エントリーポイント ───────────────────────────────────────────
+const urlCode=getRoomCodeFromURL();
+if(urlCode){ renderJoinCode(urlCode); }
+else{ renderHome(); }
+</script>
+</body>
+</html>
